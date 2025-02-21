@@ -86,21 +86,27 @@ def writeCSVs(h5_filename: str, config: AnalysisConfig, drifts: List[Drift]):
     for drift_index, drift in enumerate(drifts):
         assert(len(drift.filteredVerticalAcceleration.utime) == len(drift.elevation.utime))
 
-        csv_filename = f'{h5_filename}-drift-{drift_index + 1}.csv'
+        series = {
+            'raw-acceleration': drift.rawVerticalAcceleration,
+            'filtered-acceleration': drift.filteredVerticalAcceleration,
+            'elevation': drift.elevation
+        }
 
-        with open(csv_filename, 'w') as fp:
-            columns = {
-                'timestamp (micros)': drift.rawVerticalAcceleration.utime,
-                'time (UTC)': [datetime.fromtimestamp(timestamp / 1e6, tz=pytz.utc) for timestamp in drift.rawVerticalAcceleration.utime],
-                'filtered acceleration (m/s^2)': drift.filteredVerticalAcceleration.y_values,
-                'elevation (m)': drift.elevation.y_values
-            }
+        for serie_name, serie in series.items():
+            csv_filename = f'{h5_filename}-drift-{drift_index + 1}-{serie_name}.csv'
 
-            writer = csv.DictWriter(fp, columns.keys())
-            writer.writeheader()
+            with open(csv_filename, 'w') as fp:
+                columns = {
+                    'timestamp (micros)': serie.utime,
+                    'time (UTC)': [datetime.fromtimestamp(timestamp / 1e6, tz=pytz.utc) for timestamp in serie.utime],
+                    serie.name: serie.y_values,
+                }
 
-            for time_index in range(len(drift.filteredVerticalAcceleration.utime)):
-                writer.writerow({ column_name: column_list[time_index] for column_name, column_list in columns.items()})
+                writer = csv.DictWriter(fp, columns.keys())
+                writer.writeheader()
+
+                for time_index in range(len(drift.filteredVerticalAcceleration.utime)):
+                    writer.writerow({ column_name: column_list[time_index] for column_name, column_list in columns.items()})
 
 
 def main():

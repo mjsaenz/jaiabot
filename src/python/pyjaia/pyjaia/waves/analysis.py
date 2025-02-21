@@ -148,8 +148,9 @@ def powerSpectrumBurg(elevation: List[float], config: DriftAnalysisConfig):
 
 def doDriftAnalysis(verticalAcceleration: Series, config: DriftAnalysisConfig):
     drift = Drift()
-    drift.rawVerticalAcceleration = verticalAcceleration.makeUniform(config.sampleFreq)
-    drift.filteredVerticalAcceleration = drift.rawVerticalAcceleration
+    drift.rawVerticalAcceleration = deepcopy(verticalAcceleration)
+    drift.rawVerticalAcceleration.name = 'Raw Vertical Acceleration (m/s^2)'
+    drift.filteredVerticalAcceleration = drift.rawVerticalAcceleration.makeUniform(config.sampleFreq)
 
     # Trim the series to avoid motor-induce noise
     drift.filteredVerticalAcceleration = trimSeries(drift.filteredVerticalAcceleration, 10e6, 5e6)
