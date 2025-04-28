@@ -39,7 +39,7 @@ def JSONErrorResponse(msg):
     return JSONResponse(obj)
 
 def JSONExceptionResponse(exception: Exception):
-    obj = {"error": str(exception), "traceback": traceback.format_exception(exception)}
+    obj = {"error": str(exception), "traceback": traceback.format_exception(Exception, value=exception, tb=exception.__traceback__)}
     return JSONResponse(obj)
 
 # The flask app
