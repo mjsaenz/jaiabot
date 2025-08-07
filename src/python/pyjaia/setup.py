@@ -15,9 +15,11 @@ setup(name='pyjaia',
         'scipy', 
         'numpy', 
         'cmocean',
-        'turfpy'
+        'turfpy',
+        'gdal'
         ],
     scripts=[
-        'src/pyjaia/waves/jaia-analyze-waves.py'
+        'src/pyjaia/waves/jaia-analyze-waves.py',
+        'src/pyjaia/maps/s57.py'
     ]
 )
