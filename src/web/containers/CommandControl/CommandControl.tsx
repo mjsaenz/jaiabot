@@ -4403,6 +4403,36 @@ export default class CommandControl extends React.Component {
                             }
                             return;
                         }
+                        // LS BUTTON (Left Stick): Run mission command
+                        else if (buttonName === "LS") {
+                            if (selectedBotId) {
+                                // Show confirmation dialog for specific bot
+                                CustomAlert.confirm(
+                                    `Are you sure you'd like to play this run for Bot: ${selectedBotId}?`,
+                                    "Play Run",
+                                    () => {
+                                        this.takeControl(() => {
+                                            const run = this.getRun(selectedBotId);
+                                            if (run) {
+                                                this.setRcMode(selectedBotId, false);
+                                                this._runMission(run.command);
+                                                success(
+                                                    `Started mission for Bot: ${selectedBotId}`,
+                                                );
+                                            } else {
+                                                error(
+                                                    `No mission assigned to Bot: ${selectedBotId}`,
+                                                );
+                                            }
+                                        });
+                                    },
+                                );
+                            } else {
+                                // No bot selected → trigger run mission for all
+                                this.playClicked(null);
+                            }
+                            return;
+                        }
                         // START BUTTON: Activate/System Check bot command
                         else if (buttonName == "Start") {
                             if (selectedBotId) {
