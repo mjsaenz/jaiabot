@@ -62,6 +62,7 @@ enum AccordionTabs {
     MapLayers = "MAP_LAYERS",
     Engineering = "ENGINEERING",
     Simulation = "SIMULATION",
+    RemoteController = "REMOTE_CONTROLLER",
 }
 
 /**
@@ -313,8 +314,35 @@ export function SettingsPanel(props: Props) {
                         </AccordionDetails>
                     </Accordion>
                 </ThemeProvider>
-
+                <ThemeProvider theme={accordionTheme}>
+                    <Accordion
+                        expanded={isOpenAccordionTab(AccordionTabs.RemoteController)}
+                        onChange={() => handleAccordionTabClick(AccordionTabs.RemoteController)}
+                        className="accordionContainer"
+                    >
+                        <AccordionSummary
+                            expandIcon={<ExpandMoreIcon />}
+                            aria-controls="panel1a-content"
+                            id="panel1a-header"
+                        >
+                            <Typography>Remote Controller</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails className="settings-accordion-inner-container">
+                            <div id="remoteControllerPanel">
+                                <div className="panel">
+                                    <Button
+                                        className="Advanced Controller"
+                                        onClick={() => window.open("/rc-mode/")}
+                                    >
+                                        Advanced Controller
+                                    </Button>
+                                </div>
+                            </div>
+                        </AccordionDetails>
+                    </Accordion>
+                </ThemeProvider>
                 {simulationAccordion()}
+                // Removed misplaced Remote Controller markup
             </div>
         </div>
     );
