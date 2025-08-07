@@ -329,12 +329,25 @@ export function SettingsPanel(props: Props) {
                         </AccordionSummary>
                         <AccordionDetails className="settings-accordion-inner-container">
                             <div id="remoteControllerPanel">
-                                <div className="panel">
+                                <div
+                                    className="panel"
+                                    style={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        gap: "16px",
+                                    }}
+                                >
                                     <Button
-                                        className="Advanced Controller"
+                                        className="button-jcc"
                                         onClick={() => window.open("/rc-mode/")}
                                     >
                                         Advanced Controller
+                                    </Button>
+                                    <Button
+                                        className="button-jcc"
+                                        onClick={() => window.open("/rc-mode/")}
+                                    >
+                                        User-Friendly Controller
                                     </Button>
                                 </div>
                             </div>
