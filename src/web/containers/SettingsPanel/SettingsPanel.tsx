@@ -84,6 +84,9 @@ export function SettingsPanel(props: Props) {
         }),
     );
 
+    const [isAdvancedModeOn, setAdvancedModeOn] = useState(true);
+    const [isUserFriendlyModeOn, setUserFriendlyModeOn] = useState(false);
+
     const handleClusterToggleClick = () => {
         // Task packets within this distance (meters) will be clustered
         const defaultDistance = 30;
@@ -328,27 +331,30 @@ export function SettingsPanel(props: Props) {
                             <Typography>Remote Controller</Typography>
                         </AccordionSummary>
                         <AccordionDetails className="settings-accordion-inner-container">
-                            <div id="remoteControllerPanel">
-                                <div
-                                    className="panel"
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        gap: "16px",
-                                    }}
-                                >
-                                    <Button
-                                        className="button-jcc"
-                                        onClick={() => window.open("/rc-mode/")}
-                                    >
+                            <div id="remoteControllerPanel" className="map-layers-inner-container">
+                                <div className="settings-card">
+                                    <JaiaToggle
+                                        checked={() => isAdvancedModeOn}
+                                        onClick={() => {
+                                            setAdvancedModeOn(true);
+                                            setUserFriendlyModeOn(false);
+                                        }}
+                                    />
+                                    <span style={{ marginLeft: "12px", fontWeight: "bold" }}>
                                         Advanced Controller
-                                    </Button>
-                                    <Button
-                                        className="button-jcc"
-                                        onClick={() => window.open("/rc-mode/")}
-                                    >
+                                    </span>
+                                </div>
+                                <div className="settings-card">
+                                    <JaiaToggle
+                                        checked={() => isUserFriendlyModeOn}
+                                        onClick={() => {
+                                            setAdvancedModeOn(false);
+                                            setUserFriendlyModeOn(true);
+                                        }}
+                                    />
+                                    <span style={{ marginLeft: "12px", fontWeight: "bold" }}>
                                         User-Friendly Controller
-                                    </Button>
+                                    </span>
                                 </div>
                             </div>
                         </AccordionDetails>
