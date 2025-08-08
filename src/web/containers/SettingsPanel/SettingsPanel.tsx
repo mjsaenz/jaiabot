@@ -332,7 +332,15 @@ export function SettingsPanel(props: Props) {
                         </AccordionSummary>
                         <AccordionDetails className="settings-accordion-inner-container">
                             <div id="remoteControllerPanel" className="map-layers-inner-container">
-                                <div className="settings-card">
+                                <div
+                                    className="settings-card"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <span style={{ fontWeight: "bold" }}>Advanced Controller:</span>
                                     <JaiaToggle
                                         checked={() => isAdvancedModeOn}
                                         onClick={() => {
@@ -340,11 +348,18 @@ export function SettingsPanel(props: Props) {
                                             setUserFriendlyModeOn(false);
                                         }}
                                     />
-                                    <span style={{ marginLeft: "12px", fontWeight: "bold" }}>
-                                        Advanced Controller
-                                    </span>
                                 </div>
-                                <div className="settings-card">
+                                <div
+                                    className="settings-card"
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        justifyContent: "space-between",
+                                    }}
+                                >
+                                    <span style={{ fontWeight: "bold" }}>
+                                        User-Friendly Controller:
+                                    </span>
                                     <JaiaToggle
                                         checked={() => isUserFriendlyModeOn}
                                         onClick={() => {
@@ -352,9 +367,6 @@ export function SettingsPanel(props: Props) {
                                             setUserFriendlyModeOn(true);
                                         }}
                                     />
-                                    <span style={{ marginLeft: "12px", fontWeight: "bold" }}>
-                                        User-Friendly Controller
-                                    </span>
                                 </div>
                             </div>
                         </AccordionDetails>
