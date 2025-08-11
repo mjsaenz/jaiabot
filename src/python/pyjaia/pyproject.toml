@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyjaia"
+version = "2.0.0"
+description = "Jaia python utilities"
+authors = [
+        { name = "Jaia Robotics Team" },
+    ]
+keywords = ["jaia", "robotics", "python"]
+dependencies = [
+        'wheel', 
+        'protobuf==3.20.0', 
+        'scipy', 
+        'numpy', 
+        'cmocean',
+        'turfpy',
+        'gdal'
+    ]
+
+[project.scripts]
+jaia-analyze-waves = "pyjaia.waves.tool:main"
+jaia-s57-tool = "pyjaia.maps.s57:main"
+
