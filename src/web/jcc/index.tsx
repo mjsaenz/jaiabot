@@ -16,7 +16,7 @@ import { diveLayer } from "../openlayers/layers/vector/dive-layer";
 import { driftLayer } from "../openlayers/layers/vector/drift-layer";
 import { hubCommsLayer } from "../openlayers/layers/vector/hub-comms-layer";
 import { sentinelLayer } from "../openlayers/layers/vector/sentinel-layer";
-import { SentinelData, Track } from "../types/protobuf-types";
+import { Intercept, Track } from "../types/protobuf-types";
 import {
     DATA_MODEL_POLL_TIME,
     INITAL_ZOOM_DURATION,
@@ -27,7 +27,8 @@ import {
 // Sample status messages twice as fast as produced by Bots and Hubs to reduce potential data age issues
 const statusURL = "http://localhost:40001/jaia/v0/status";
 const taskPacketURL = "http://localhost:40001/jaia/v0/task-packets";
-const sentinelURL = "http://localhost:40001/jaia/v0/sentinel-tracks";
+const sentinelTracksURL = "http://localhost:40001/jaia/v0/sentinel-tracks";
+const sentinelInterceptURL = "";
 
 let isFirstBot = true;
 
@@ -64,12 +65,26 @@ const taskPacketInterval = setInterval(async () => {
 
 const sentinelTrackInterval = setInterval(async () => {
     try {
-        const response = await fetch(sentinelURL);
+        const response = await fetch(sentinelTracksURL);
         if (!response.ok) {
             console.error(`Response status: ${response.status}`);
         } else {
             const json = await response.json();
             updateSentinelTracks(json);
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}, DATA_MODEL_POLL_TIME);
+
+const sentinelInterceptInterval = setInterval(async () => {
+    try {
+        const response = await fetch(sentinelInterceptURL);
+        if (!response.ok) {
+            console.error(`Response status: ${response.status}`);
+        } else {
+            const json = await response.json();
+            updateSentinelIntercepts(json);
         }
     } catch (error) {
         console.error(error);
@@ -103,13 +118,22 @@ function updateHubs(hubStatuses: { [hubId: string]: PortalHubStatus }) {
 }
 
 function updateSentinelTracks(tracksRaw: { [trackID: number]: Track }) {
-    const tracks = new Map();
+    const tracks = new Map<number, Track>();
     const trackIDs = Object.keys(tracksRaw);
-    for (let trackID of trackIDs) {
+    for (const trackID of trackIDs) {
         tracks.set(Number(trackID), tracksRaw[Number(trackID)]);
     }
     sentinel.setTracks(tracks);
     sentinelLayer.updateFeatures();
+}
+
+function updateSentinelIntercepts(interceptsRaw: { [botID: number]: Intercept }) {
+    const intercepts = new Map<number, Intercept>();
+    const botIDs = Object.keys(interceptsRaw);
+    for (const botID of botIDs) {
+        intercepts.set(Number(botID), interceptsRaw[Number(botID)]);
+    }
+    sentinel.setIntercepts(intercepts);
 }
 
 /**

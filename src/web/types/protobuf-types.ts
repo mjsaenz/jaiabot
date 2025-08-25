@@ -1242,9 +1242,16 @@ export interface Track {
     age?: number;
 }
 
+export enum InterceptState {
+    IN_PROGRESS = 1,
+    TERMINATED = 2,
+    CANCELLED = 3,
+}
+
 export interface Intercept {
     trackID?: number;
     location?: GeographicCoordinate;
+    state?: InterceptState;
 }
 
 export interface SentinelData {
