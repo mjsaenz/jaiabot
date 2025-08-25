@@ -20,7 +20,7 @@ class SentinelLayer extends JaiaVectorLayer {
         }
 
         for (const [botID, intercept] of sentinel.getIntercepts()) {
-            const interceptFeature = generateInterceptFeature(intercept);
+            const interceptFeature = generateInterceptFeature(botID, intercept);
             source.addFeature(interceptFeature);
         }
     }
