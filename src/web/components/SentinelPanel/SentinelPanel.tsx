@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import { JaiaDispatchContext } from "../../context/JaiaContext";
 import { JaiaActions } from "../../context/jaia-actions";
-import { BotsToIntercept, Track } from "../../types/protobuf-types";
+import { bots } from "../../data/bots/bots";
 import { jaiaAPI } from "../../utils/jaia-api";
 import { error, success } from "../../utils/notifications";
+import { BotsToIntercept, Track } from "../../types/protobuf-types";
 import "./SentinelPanel.less";
 
 interface Props {
@@ -73,18 +74,17 @@ export default function SentinelPanel(props: Props) {
                 <div>{props.track?.heading?.toFixed(0)}</div>
             </div>
             <div className="bot-select-container">
-                <button className={getClassName(1)} onClick={() => handleBotClick(1)}>
-                    Bot 1
-                </button>
-                <button className={getClassName(2)} onClick={() => handleBotClick(2)}>
-                    Bot 2
-                </button>
-                <button className={getClassName(3)} onClick={() => handleBotClick(3)}>
-                    Bot 3
-                </button>
-                <button className={getClassName(4)} onClick={() => handleBotClick(4)}>
-                    Bot 4
-                </button>
+                {Array.from(bots.getBots().values()).map((bot) => {
+                    return (
+                        <button
+                            className={getClassName(bot.getBotID())}
+                            onClick={() => handleBotClick(bot.getBotID())}
+                            key={bot.getBotID()}
+                        >
+                            Bot {bot.getBotID()}
+                        </button>
+                    );
+                })}
             </div>
             <div className="action-buttons-container">
                 <button onClick={() => handleClickedCloseButton()}>Close</button>
