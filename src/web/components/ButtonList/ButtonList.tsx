@@ -85,7 +85,7 @@ export default function ButtonList(props: Props) {
                         handleButtonClick(ButtonTypes.PANEL, ButtonNames.JAIA_ABOUT_PANEL)
                     }
                 >
-                    <img src={JaiaLogo} title="About" />
+                    {/* <img src={JaiaLogo} title="About" /> */}
                 </Button>
             </div>
         );
