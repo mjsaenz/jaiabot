@@ -194,8 +194,8 @@ class InterceptInfo:
 
 # ======== Global Vars =========
 
-min_time_to_update_intercept_secs = 10
-predict_ahead_secs = 10
+min_time_to_update_intercept_secs = 5
+predict_ahead_secs = 15
 sentinel_tracks = {}
 bots = {}
 # Keep track of bots intercepting tracks
@@ -493,10 +493,10 @@ def intercept_tack() -> None:
                 continue
 
             lat, lon, t = result
-            intercept_tracks[bot_id].lat = lat
-            intercept_tracks[bot_id].lon = lon
-
+            
             if t > min_time_to_update_intercept_secs:
+                intercept_tracks[bot_id].lat = lat
+                intercept_tracks[bot_id].lon = lon
                 post_command(intercept_tracks[bot_id])
                 post_intercept_track(intercept_tracks[bot_id])
                 print("Sending updated intercept location.")
