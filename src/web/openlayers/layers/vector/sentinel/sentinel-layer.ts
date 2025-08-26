@@ -1,5 +1,6 @@
 import JaiaVectorLayer from "../jaia-vector-layer";
 import { LayerTitles } from "../../../../types/openlayers-types";
+import { TrackState } from "../../../../types/protobuf-types";
 import { layersZIndexes } from "../../zindex";
 import { generateTrackFeature } from "../../../features/sentinel/track-feature";
 import {
@@ -18,6 +19,13 @@ class SentinelLayer extends JaiaVectorLayer {
         source.clear();
 
         for (const [trackID, track] of sentinel.getTracks()) {
+            if (
+                track.track_state === TrackState.ABANDONED ||
+                track.track_state === TrackState.DEAD ||
+                track.track_state === TrackState.REMOVED_HIDDEN
+            ) {
+                continue;
+            }
             const trackFeature = generateTrackFeature(track);
             source.addFeature(trackFeature);
         }

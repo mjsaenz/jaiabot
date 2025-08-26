@@ -16,6 +16,7 @@ import { diveLayer } from "../openlayers/layers/vector/dive-layer";
 import { driftLayer } from "../openlayers/layers/vector/drift-layer";
 import { hubCommsLayer } from "../openlayers/layers/vector/hub-comms-layer";
 import { sentinelLayer } from "../openlayers/layers/vector/sentinel/sentinel-layer";
+import { sentinelLayerDead } from "../openlayers/layers/vector/sentinel/sentinel-layer-dead";
 import { Intercept, Track } from "../types/protobuf-types";
 import {
     DATA_MODEL_POLL_TIME,
@@ -125,6 +126,7 @@ function updateSentinelTracks(tracksRaw: { [trackID: number]: Track }) {
     }
     sentinel.setTracks(tracks);
     sentinelLayer.updateFeatures();
+    sentinelLayerDead.updateFeatures();
 }
 
 function updateSentinelIntercepts(interceptsRaw: { [botID: number]: Intercept }) {

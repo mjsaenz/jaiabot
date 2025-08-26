@@ -1215,21 +1215,21 @@ export interface ContactStatus {
 }
 
 export enum TrackState {
-    DEAD = 1,
-    BORN = 2,
-    ACTIVE = 3,
-    PREDICTING = 4,
-    ABANDONED = 5,
-    LAGGED = 6,
-    PERSISTED = 7,
-    REMOVED_HIDDEN = 8,
+    DEAD = "DEAD",
+    BORN = "BORN",
+    ACTIVE = "ACTIVE",
+    PREDICTING = "PREDICTING",
+    ABANDONED = "ABANDONED",
+    LAGGED = "LAGGED",
+    PERSISTED = "PERSISTED",
+    REMOVED_HIDDEN = "REMOVED_HIDDEN",
 }
 
 export enum AlertState {
-    MODERATE = 1,
-    SUBSTANTIAL = 2,
-    SEVERE = 3,
-    CRITICAL = 4,
+    MODERATE = "MODERATE",
+    SUBSTANTIAL = "SUBSTANTIAL",
+    SEVERE = "SEVERE",
+    CRITICAL = "CRITICAL",
 }
 
 export interface Track {

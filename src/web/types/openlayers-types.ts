@@ -11,6 +11,7 @@ export enum LayerTitles {
     RALLY_LAYER = "rally-layer",
     MEASURE_LAYER = "measure-layer",
     SENTINEL_LAYER = "sentinel-layer",
+    SENTINEL_LAYER_DEAD = "sentinel-layer-dead",
 }
 
 export enum MapFeatureTypes {

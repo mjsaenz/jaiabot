@@ -13,6 +13,7 @@ import { driftLayer } from "./vector/drift-layer";
 import { measureLayer } from "./vector/measure-layer";
 import { hubCommsLayer } from "./vector/hub-comms-layer";
 import { sentinelLayer } from "./vector/sentinel/sentinel-layer";
+import { sentinelLayerDead } from "./vector/sentinel/sentinel-layer-dead";
 
 import { LayerTitles } from "../../types/openlayers-types";
 
@@ -35,6 +36,7 @@ class Layers {
         this.layers.set(LayerTitles.MEASURE_LAYER, measureLayer.getVectorLayer());
         this.layers.set(LayerTitles.HUB_COMMS_LAYER, hubCommsLayer.getVectorLayer());
         this.layers.set(LayerTitles.SENTINEL_LAYER, sentinelLayer.getVectorLayer());
+        this.layers.set(LayerTitles.SENTINEL_LAYER_DEAD, sentinelLayerDead.getVectorLayer());
     }
 
     getLayers() {
