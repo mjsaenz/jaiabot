@@ -216,6 +216,24 @@ export default function LayerSwitcherMenu() {
                             />
                             <p>Missions</p>
                         </div>
+                        <div className="layer-container">
+                            <Checkbox
+                                onClick={() => handleLayerClick(LayerTitles.SENTINEL_LAYER)}
+                                checked={layerCheckedStates.get(LayerTitles.SENTINEL_LAYER)}
+                                sx={getCheckboxStyle()}
+                                data-testid={`${LayerTitles.SENTINEL_LAYER}-checkbox`}
+                            />
+                            <p>Sentinel</p>
+                        </div>
+                        <div className="layer-container">
+                            <Checkbox
+                                onClick={() => handleLayerClick(LayerTitles.SENTINEL_LAYER_DEAD)}
+                                checked={layerCheckedStates.get(LayerTitles.SENTINEL_LAYER_DEAD)}
+                                sx={getCheckboxStyle()}
+                                data-testid={`${LayerTitles.SENTINEL_LAYER_DEAD}-checkbox`}
+                            />
+                            <p>Sentinel (Dead)</p>
+                        </div>
                     </AccordionDetails>
                 </Accordion>
             </ThemeProvider>
