@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { JaiaDispatchContext } from "../../context/JaiaContext";
 import { JaiaActions } from "../../context/jaia-actions";
 import { Intercept } from "../../types/protobuf-types";
-import "./SentinelPanelIntercept.less";
+import "./SentinelPanelTrack.less";
 
 interface Props {
     intercept: Intercept;

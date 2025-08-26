@@ -21,7 +21,7 @@ import WaypointPanel from "../components/WaypointPanel/WaypointPanel";
 import TaskPacketPanel from "../components/TaskPacketPanel/TaskPacketPanel";
 import DataOffloadPanel from "../components/DataOffloadPanel/DataOffloadPanel";
 import RemoteControlPanel from "../components/RemoteControlPanel/RemoteControlPanel";
-import SentinelPanelTrack from "../components/SentinelPanelTrack/SentinelPanelTrack";
+import SentinelPanelTrack from "../components/Sentinel/SentinelPanelTrack";
 
 import "./App.less";
 
