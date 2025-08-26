@@ -5,7 +5,7 @@ import { bots } from "../../data/bots/bots";
 import { jaiaAPI } from "../../utils/jaia-api";
 import { error, success } from "../../utils/notifications";
 import { BotsToIntercept, Track } from "../../types/protobuf-types";
-import "./SentinelPanelTrack.less";
+import "./SentinelPanel.less";
 
 interface Props {
     track: Track;
@@ -51,7 +51,7 @@ export default function SentinelPanelTrack(props: Props) {
     return (
         <div className="jaia-panel sentinel-panel">
             <div className="jaia-panel-title">Track {props.track.id}</div>
-            <div className="track-data-container">
+            <div className="sentinel-data-container">
                 <div className="label">Age:</div>
                 <div>{props.track?.age?.toFixed(0)}</div>
 

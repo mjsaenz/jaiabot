@@ -2,7 +2,7 @@ import { useContext } from "react";
 import { JaiaDispatchContext } from "../../context/JaiaContext";
 import { JaiaActions } from "../../context/jaia-actions";
 import { Intercept } from "../../types/protobuf-types";
-import "./SentinelPanelTrack.less";
+import "./SentinelPanel.less";
 
 interface Props {
     intercept: Intercept;
@@ -18,7 +18,7 @@ export default function SentinelPanelIntercept(props: Props) {
     return (
         <div className="jaia-panel sentinel-panel">
             <div className="jaia-panel-title">Intercept {props.intercept.bot_id}</div>
-            <div className="track-data-container">
+            <div className="sentinel-data-container">
                 <div className="label">Track ID:</div>
                 <div>{props.intercept?.track_id}</div>
 
