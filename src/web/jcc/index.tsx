@@ -28,7 +28,7 @@ import {
 const statusURL = "http://localhost:40001/jaia/v0/status";
 const taskPacketURL = "http://localhost:40001/jaia/v0/task-packets";
 const sentinelTracksURL = "http://localhost:40001/jaia/v0/sentinel-tracks";
-const sentinelInterceptURL = "";
+const sentinelInterceptURL = "http://localhost:40001/jaia/v0/intercept-tracks";
 
 let isFirstBot = true;
 
