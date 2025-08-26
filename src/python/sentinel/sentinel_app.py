@@ -35,6 +35,7 @@ parser.add_argument("--status-url", default="http://localhost:40001/jaia/v0/stat
 parser.add_argument("--bots-to-intercept-url", default="http://localhost:40001/jaia/v0/bots-to-intercept", help="URL for the bots to intercept endpoint")
 parser.add_argument("--single-wpt-url", default="http://localhost:40001/jaia/v0/single-waypoint-mission", help="URL for the single wpt command endpoint")
 parser.add_argument("--intercept-track-url", default="http://localhost:40001/jaia/v0/intercept-track", help="URL for to send the intercept location endpoint")
+parser.add_argument("--test-intercept", type=bool, default=False, help="Test intercept with bot 1")
 args = parser.parse_args()
 
 logging.warning(args)
@@ -173,7 +174,7 @@ class TrackState(Enum):
     REMOVED_HIDDEN = 7
 
 # How threatening or important a track is
-class TrackState(Enum):
+class AlertState(Enum):
     MODERATE = 1
     SUBSTANTIAL = 2
     SEVERE = 3
@@ -363,6 +364,41 @@ def handle_one_message(payload: bytes) -> None:
 
     post_tracks(msg.tracks)
 
+def translate_bot_status_to_track(new_data) -> None:
+
+    bot_id = "1"
+
+    if bot_id in new_data:
+        bot = new_data[bot_id]
+
+        msg = sentinel_pb2.Track()
+
+        # Scalars
+        msg.id = int(bot_id)
+        msg.heading = float(bot["attitude"]["heading"])
+        msg.speed = float(bot["speed"]["over_ground"] )
+        msg.age = float(bot["lastStatusReceivedTime"])
+
+        # Location
+        loc = geographic_coordinate_pb2.GeographicCoordinate()
+        loc.lat = bot["location"]["lat"]
+        loc.lon = bot["location"]["lon"] 
+        msg.location.CopyFrom(loc)
+
+        # Enums
+        msg.track_state = TrackState.ACTIVE.value
+        msg.alert_state = AlertState.MODERATE.value
+
+        # Save the known tracks
+        set_sentinel_track(msg.id, msg)
+
+        payload = [MessageToDict(msg, preserving_proto_field_name=True)]
+
+        try:
+            requests.post(args.tracks_url, json=payload, timeout=3.0)
+        except Exception as e:
+            logging.warning("Track Post Error: ", e)
+
 # ======== loops ========
 
 def connect_to_sentinel() -> None:
@@ -381,6 +417,9 @@ def connect_to_jaia_bot_status() -> None:
             resp = requests.get(args.status_url, timeout=3)
             new_data = resp.json()
             set_bots(new_data)
+
+            if args.test_intercept:
+                translate_bot_status_to_track(new_data)
         except (requests.RequestException, ValueError) as e:
             print(f"Error updating bots: {e}")
         time.sleep(1)
