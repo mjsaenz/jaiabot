@@ -26,10 +26,10 @@ import {
 } from "../utils/constants";
 
 // Sample status messages twice as fast as produced by Bots and Hubs to reduce potential data age issues
-const statusURL = "http://localhost:40001/jaia/v0/status";
-const taskPacketURL = "http://localhost:40001/jaia/v0/task-packets";
-const sentinelTracksURL = "http://localhost:40001/jaia/v0/sentinel-tracks";
-const sentinelInterceptURL = "http://localhost:40001/jaia/v0/intercept-tracks";
+const statusURL = "/jaia/v0/status";
+const taskPacketURL = "/jaia/v0/task-packets";
+const sentinelTracksURL = "/jaia/v0/sentinel-tracks";
+const sentinelInterceptURL = "/jaia/v0/intercept-tracks";
 
 let isFirstBot = true;
 
