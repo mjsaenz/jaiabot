@@ -1249,8 +1249,9 @@ export enum InterceptState {
 }
 
 export interface Intercept {
-    trackID?: number;
+    track_id?: number;
     location?: GeographicCoordinate;
+    bot_id?: number;
     state?: InterceptState;
 }
 
