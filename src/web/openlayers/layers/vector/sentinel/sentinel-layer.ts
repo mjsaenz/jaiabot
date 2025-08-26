@@ -1,12 +1,12 @@
-import JaiaVectorLayer from "./jaia-vector-layer";
-import { LayerTitles } from "../../../types/openlayers-types";
-import { layersZIndexes } from "../zindex";
-import { generateTrackFeature } from "../../features/sentinel/track-feature";
+import JaiaVectorLayer from "../jaia-vector-layer";
+import { LayerTitles } from "../../../../types/openlayers-types";
+import { layersZIndexes } from "../../zindex";
+import { generateTrackFeature } from "../../../features/sentinel/track-feature";
 import {
     generateInterceptFeature,
     generateInterceptLineFeature,
-} from "../../features/sentinel/intercept-feature";
-import { sentinel } from "../../../data/sentinel/sentinel";
+} from "../../../features/sentinel/intercept-feature";
+import { sentinel } from "../../../../data/sentinel/sentinel";
 
 class SentinelLayer extends JaiaVectorLayer {
     constructor() {

@@ -15,7 +15,7 @@ import { missionLayer } from "../openlayers/layers/vector/mission-layer";
 import { diveLayer } from "../openlayers/layers/vector/dive-layer";
 import { driftLayer } from "../openlayers/layers/vector/drift-layer";
 import { hubCommsLayer } from "../openlayers/layers/vector/hub-comms-layer";
-import { sentinelLayer } from "../openlayers/layers/vector/sentinel-layer";
+import { sentinelLayer } from "../openlayers/layers/vector/sentinel/sentinel-layer";
 import { Intercept, Track } from "../types/protobuf-types";
 import {
     DATA_MODEL_POLL_TIME,

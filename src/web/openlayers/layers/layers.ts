@@ -12,7 +12,7 @@ import { diveLayer } from "./vector/dive-layer";
 import { driftLayer } from "./vector/drift-layer";
 import { measureLayer } from "./vector/measure-layer";
 import { hubCommsLayer } from "./vector/hub-comms-layer";
-import { sentinelLayer } from "./vector/sentinel-layer";
+import { sentinelLayer } from "./vector/sentinel/sentinel-layer";
 
 import { LayerTitles } from "../../types/openlayers-types";
 
