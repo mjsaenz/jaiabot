@@ -17,11 +17,11 @@ import RallyPanel from "../components/RallyPanel/RallyPanel";
 import MeasurePanel from "../components/MeasurePanel/MeasurePanel";
 import MissionsPanel from "../containers/MissionsPanel/MissionsPanel";
 import SettingsPanel from "../components/SettingsPanel/SettingsPanel";
-import SentinelPanel from "../components/SentinelPanel/SentinelPanel";
 import WaypointPanel from "../components/WaypointPanel/WaypointPanel";
 import TaskPacketPanel from "../components/TaskPacketPanel/TaskPacketPanel";
 import DataOffloadPanel from "../components/DataOffloadPanel/DataOffloadPanel";
 import RemoteControlPanel from "../components/RemoteControlPanel/RemoteControlPanel";
+import SentinelPanelTrack from "../components/SentinelPanelTrack/SentinelPanelTrack";
 
 import "./App.less";
 
@@ -99,7 +99,9 @@ function Panel() {
         case ButtonNames.MEASURE_TOOL:
             return <MeasurePanel />;
         case ButtonNames.SENTINEL:
-            return <SentinelPanel track={sentinel.getTracks().get(sentinel.getSelectedID())} />;
+            return (
+                <SentinelPanelTrack track={sentinel.getTracks().get(sentinel.getSelectedID())} />
+            );
         default:
             return <div></div>;
     }

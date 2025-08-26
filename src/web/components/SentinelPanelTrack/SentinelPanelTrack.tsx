@@ -5,13 +5,13 @@ import { bots } from "../../data/bots/bots";
 import { jaiaAPI } from "../../utils/jaia-api";
 import { error, success } from "../../utils/notifications";
 import { BotsToIntercept, Track } from "../../types/protobuf-types";
-import "./SentinelPanel.less";
+import "./SentinelPanelTrack.less";
 
 interface Props {
     track: Track;
 }
 
-export default function SentinelPanel(props: Props) {
+export default function SentinelPanelTrack(props: Props) {
     const jaiaDispatch = useContext(JaiaDispatchContext);
     const [selectedBotIDs, setSelectedBotIDs] = useState(new Map<number, boolean>());
 
