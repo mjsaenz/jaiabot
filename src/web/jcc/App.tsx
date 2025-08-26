@@ -22,6 +22,7 @@ import TaskPacketPanel from "../components/TaskPacketPanel/TaskPacketPanel";
 import DataOffloadPanel from "../components/DataOffloadPanel/DataOffloadPanel";
 import RemoteControlPanel from "../components/RemoteControlPanel/RemoteControlPanel";
 import SentinelPanelTrack from "../components/Sentinel/SentinelPanelTrack";
+import SentinelPanelIntercept from "../components/Sentinel/SentinelPanelIntercept";
 
 import "./App.less";
 
@@ -98,9 +99,15 @@ function Panel() {
             return <SettingsPanel />;
         case ButtonNames.MEASURE_TOOL:
             return <MeasurePanel />;
-        case ButtonNames.SENTINEL:
+        case ButtonNames.SENTINEL_TRACK:
             return (
                 <SentinelPanelTrack track={sentinel.getTracks().get(sentinel.getSelectedID())} />
+            );
+        case ButtonNames.SENTINEL_INTERCEPT:
+            return (
+                <SentinelPanelIntercept
+                    intercept={sentinel.getIntercepts().get(sentinel.getSelectedID())}
+                />
             );
         default:
             return <div></div>;

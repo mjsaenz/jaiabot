@@ -1022,7 +1022,14 @@ function handleClickedSentinelFeature(
     clickedSentinelFeature: SelectedSentinelFeature,
 ) {
     sentinel.setSelectedID(clickedSentinelFeature.trackID);
-    mutableState.visiblePanel = ButtonNames.SENTINEL;
+    switch (clickedSentinelFeature.type) {
+        case MapFeatureTypes.SENTINAL_TRACK:
+            mutableState.visiblePanel = ButtonNames.SENTINEL_TRACK;
+            break;
+        case MapFeatureTypes.SENTINAL_INTERCEPT:
+            mutableState.visiblePanel = ButtonNames.SENTINEL_INTERCEPT;
+            break;
+    }
     return mutableState;
 }
 

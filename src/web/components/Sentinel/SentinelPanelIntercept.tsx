@@ -35,7 +35,7 @@ export default function SentinelPanelIntercept(props: Props) {
                 <div>{props.intercept?.location?.lon?.toFixed(5)}</div>
             </div>
 
-            <div className="action-buttons-container">
+            <div className="action-buttons-container intercept">
                 <button onClick={() => handleClickedCloseButton()}>Close</button>
             </div>
         </div>
