@@ -546,5 +546,6 @@ class Interface:
         return self.bots_to_intercept
 
     def post_bots_to_intercept(self, bots_to_intercept_msg):
+        bots_to_intercept_msg["utime"] = now_utime()
         self.bots_to_intercept = bots_to_intercept_msg
         return { 'status': 'ok' }
