@@ -70,7 +70,6 @@ export default function Map() {
                     handleSentinelClick(feature);
                     return;
                 case MapFeatureTypes.SENTINAL_INTERCEPT:
-                    handleSentinelClick(feature);
                     return;
                 default:
                     return;
