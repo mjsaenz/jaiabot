@@ -194,7 +194,8 @@ class InterceptInfo:
 
 # ======== Global Vars =========
 
-min_time_to_update_intercept = 10 # seconds
+min_time_to_update_intercept_secs = 10
+predict_ahead_secs = 10
 sentinel_tracks = {}
 bots = {}
 # Keep track of bots intercepting tracks
@@ -227,9 +228,9 @@ def remove_intercept_track(bot_id):
     with _state_lock:
         intercept_tracks.pop(bot_id, None)
 
-def set_intercept_tracks(new_intercept):
+def set_intercept_tracks(bot_id, new_intercept):
     with _state_lock:
-        intercept_tracks.update(new_intercept)
+        intercept_tracks[bot_id] = new_intercept
 
 def get_intercept_tracks():
     with _state_lock:
@@ -336,7 +337,6 @@ def post_intercept_track(track) -> None:
         msg.location.CopyFrom(loc) 
 
     payload = MessageToDict(msg, preserving_proto_field_name=True)
-
     try:
         requests.post(args.intercept_track_url, json=payload, headers=headers)
     except Exception as e:
@@ -425,9 +425,7 @@ def connect_to_jaia_bots_to_intercept() -> None:
                     bot_id=bot_id,
                     state=InterceptState.IN_PROGRESS
                 )
-                intercepts[bot_id] = new_intercept
-                set_intercept_tracks(intercepts)
-                print(intercepts[bot_id])
+                set_intercept_tracks(bot_id, new_intercept)
                 print(f"Added new intercept for Bot {bot_id}")
 
         except (requests.RequestException, ValueError) as e:
@@ -444,19 +442,17 @@ def intercept_tack() -> None:
             ref_sentinel_tracks = get_sentinel_tracks()
 
             if str(bot_id) not in ref_bots:
+                print(f"No Bot {bot_id} in bots list")
                 time.sleep(1)
                 continue
 
             if intercept.track_id not in ref_sentinel_tracks:
+                print(f"No sentinel track {intercept.track_id} in sentinel_tracks list")
                 time.sleep(1)
                 continue
 
             bot = ref_bots[str(bot_id)]
             track = ref_sentinel_tracks[intercept.track_id]
-
-            if not bot or not track:
-                time.sleep(1)
-                continue
 
             # Make sure the intercept is in progress
             if intercept.state != InterceptState.IN_PROGRESS:
@@ -489,7 +485,7 @@ def intercept_tack() -> None:
                 speed_mps=3 
             )
 
-            result = intercept_point(target, interceptor)
+            result = intercept_point(target, interceptor, predict_ahead_secs=predict_ahead_secs)
 
             if result is None:
                 print("No feasible intercept at current interceptor speed.")
@@ -500,14 +496,14 @@ def intercept_tack() -> None:
             intercept_tracks[bot_id].lat = lat
             intercept_tracks[bot_id].lon = lon
 
-            if t > min_time_to_update_intercept:
+            if t > min_time_to_update_intercept_secs:
                 post_command(intercept_tracks[bot_id])
                 post_intercept_track(intercept_tracks[bot_id])
                 print("Sending updated intercept location.")
             else:
                 intercept_tracks[bot_id].state = InterceptState.TERMINATED
                 post_intercept_track(intercept_tracks[bot_id])
-                print(f"Not sending new command. Within {min_time_to_update_intercept} sec.")
+                print(f"Not sending new command. Within {min_time_to_update_intercept_secs} sec.")
                 to_remove.append(bot_id)
 
         # now remove intercepts after the loop
