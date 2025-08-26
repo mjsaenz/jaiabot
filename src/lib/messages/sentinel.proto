@@ -57,6 +57,21 @@ message Track
     optional double age = 7;
 }
 
+message Intercept
+{
+    enum InterceptState
+    {
+        IN_PROGRESS = 1;
+        TERMINATED = 2;
+        CANCELLED = 3;
+    }
+
+    optional int32 track_id = 1;
+    optional GeographicCoordinate location = 2;
+    optional int32 bot_id = 3;
+    optional InterceptState state = 4;
+}
+
 message BotsToIntercept {
     optional int32 track_id = 1;
     repeated int32 bot_ids = 2;

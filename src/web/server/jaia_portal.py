@@ -70,6 +70,7 @@ class Interface:
 
     # Sentinel
     sentinel_tracks = {}
+    intercept_tracks = {}
     bots_to_intercept = {}
 
     def __init__(self, goby_host=('localhost', 40000), read_only=False):
@@ -412,6 +413,18 @@ class Interface:
 
         return status
     
+    def get_status_bots(self):
+        """Gets status for all online bots
+        Returns:
+            {[bot_id: int]: BotStatus}: The status for all online bots
+        """
+        for bot in self.bots.values():
+            # Add the time since last status
+            if not 'portalStatusAge' in bot:
+                bot['portalStatusAge'] = now_utime() - bot['lastStatusReceivedTime']
+        
+        return self.bots
+    
     def get_status_hubs(self):
         """Gets status for all online hubs
         Returns:
@@ -519,7 +532,19 @@ class Interface:
             self.sentinel_tracks[track_id] = track
 
         return {'status': 'ok'}
-    
+
+    def get_intercept_tracks(self):
+        return self.intercept_tracks
+
+    def post_intercept_track(self, track):
+        track_id = track["track_id"]
+        self.intercept_tracks[track_id] = track
+
+        return {'status': 'ok'}
+
+    def get_bots_to_intercept(self):
+        return self.bots_to_intercept
+
     def post_bots_to_intercept(self, bots_to_intercept_msg):
         self.bots_to_intercept = bots_to_intercept_msg
         return { 'status': 'ok' }
