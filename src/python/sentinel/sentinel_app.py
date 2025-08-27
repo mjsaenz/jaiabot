@@ -30,11 +30,11 @@ parser = argparse.ArgumentParser(description='Sentinel App that receives sentine
 parser.add_argument('-l', dest='logging_level', default='WARNING', type=str, help='Logging level (CRITICAL, ERROR, WARNING (default), INFO, DEBUG)')
 parser.add_argument("--host", default="127.0.0.1", help="IP/hostname (default: 127.0.0.1)")
 parser.add_argument("--port", type=int, default=51000, help="Tracks port (default: 51000)")
-parser.add_argument("--tracks-url", default="http://localhost:40001/jaia/v0/sentinel-tracks", help="URL for the tracks endpoint")
-parser.add_argument("--status-url", default="http://localhost:40001/jaia/v0/status-bots", help="URL for the bot status endpoint")
-parser.add_argument("--bots-to-intercept-url", default="http://localhost:40001/jaia/v0/bots-to-intercept", help="URL for the bots to intercept endpoint")
-parser.add_argument("--single-wpt-url", default="http://localhost:40001/jaia/v0/single-waypoint-mission", help="URL for the single wpt command endpoint")
-parser.add_argument("--intercept-track-url", default="http://localhost:40001/jaia/v0/intercept-track", help="URL for to send the intercept location endpoint")
+parser.add_argument("--tracks-url", default="http://localhost/jaia/v0/sentinel-tracks", help="URL for the tracks endpoint")
+parser.add_argument("--status-url", default="http://localhost/jaia/v0/status-bots", help="URL for the bot status endpoint")
+parser.add_argument("--bots-to-intercept-url", default="http://localhost/jaia/v0/bots-to-intercept", help="URL for the bots to intercept endpoint")
+parser.add_argument("--single-wpt-url", default="http://localhost/jaia/v0/single-waypoint-mission", help="URL for the single wpt command endpoint")
+parser.add_argument("--intercept-track-url", default="http://localhost/jaia/v0/intercept-track", help="URL for to send the intercept location endpoint")
 parser.add_argument("--test-intercept", type=bool, default=False, help="Test intercept with bot 1")
 args = parser.parse_args()
 
@@ -197,6 +197,7 @@ class InterceptInfo:
 
 min_time_to_update_intercept_secs = 5
 predict_ahead_secs = 15
+init_query_bots_to_intercept = True
 sentinel_tracks = {}
 bots = {}
 # Keep track of bots intercepting tracks
@@ -366,7 +367,7 @@ def handle_one_message(payload: bytes) -> None:
 
 def translate_bot_status_to_track(new_data) -> None:
 
-    bot_id = "1"
+    bot_id = "10"
 
     if bot_id in new_data:
         bot = new_data[bot_id]
@@ -422,9 +423,10 @@ def connect_to_jaia_bot_status() -> None:
                 translate_bot_status_to_track(new_data)
         except (requests.RequestException, ValueError) as e:
             print(f"Error updating bots: {e}")
-        time.sleep(1)
+        time.sleep(0.5)
 
 def connect_to_jaia_bots_to_intercept() -> None:
+    global init_query_bots_to_intercept
     while True:
         try:
             resp = requests.get(args.bots_to_intercept_url, timeout=3)
@@ -432,10 +434,14 @@ def connect_to_jaia_bots_to_intercept() -> None:
             prev_data = get_bots_to_intercept()
             intercepts = get_intercept_tracks()
 
+            if init_query_bots_to_intercept:
+                set_bots_to_intercept(new_data)
+                init_query_bots_to_intercept = False
+                continue
+
             if new_data != prev_data:
                 set_bots_to_intercept(new_data)
             else:
-                time.sleep(1)
                 continue
 
             track_id = new_data.get("track_id")
@@ -443,7 +449,6 @@ def connect_to_jaia_bots_to_intercept() -> None:
 
             if not bot_ids or not track_id:
                 print("No track data is available")
-                time.sleep(1)
                 continue
 
             for bot_id in bot_ids:
@@ -454,10 +459,11 @@ def connect_to_jaia_bots_to_intercept() -> None:
                     if intercepts[bot_id].track_id != track_id:
                         track = intercepts[bot_id]
 
-                        if track.state != InterceptState.TERMINATED and track.state != InterceptState.CANCELLED:
+                        if track.state == InterceptState.IN_PROGRESS:
                             track.state = InterceptState.CANCELLED
-                            print(f"Cancelling intercept for Bot {bot_id}")
+                            print(f"Cancelling intercept for Bot {bot_id}. Removing intercept from Bot {bot_id}")
                             post_intercept_track(track)
+                            remove_intercept_track(bot_id)
                 
                 new_intercept = InterceptInfo(
                     track_id=track_id,
@@ -471,42 +477,34 @@ def connect_to_jaia_bots_to_intercept() -> None:
             print(f"Error updating intercepts: {e}")
 
         time.sleep(1)
-    
+
 def intercept_tack() -> None:
     while True:
         # Keep list of intercepts to remove
         to_remove = []
-        for bot_id, intercept in get_intercept_tracks().items():
+        intercepts = get_intercept_tracks()
+        for bot_id, intercept in intercepts.items():
             ref_bots = get_bots()
             ref_sentinel_tracks = get_sentinel_tracks()
 
             if str(bot_id) not in ref_bots:
                 print(f"No Bot {bot_id} in bots list")
-                time.sleep(1)
                 continue
 
             if intercept.track_id not in ref_sentinel_tracks:
                 print(f"No sentinel track {intercept.track_id} in sentinel_tracks list")
-                time.sleep(1)
                 continue
 
             bot = ref_bots[str(bot_id)]
             track = ref_sentinel_tracks[intercept.track_id]
 
-            # Make sure the intercept is in progress
-            if intercept.state != InterceptState.IN_PROGRESS:
-                to_remove.append(bot_id)
-                time.sleep(1)
-                continue
-
             # operator cancelled
             if bot.get("mission_state") == "IN_MISSION__UNDERWAY__RECOVERY__STOPPED":
                 # update state first
-                intercept_tracks[bot_id].state = InterceptState.CANCELLED
-                post_intercept_track(intercept_tracks[bot_id])
-                print("Operator cancelled interception.")
+                intercepts[bot_id].state = InterceptState.CANCELLED
+                post_intercept_track(intercepts[bot_id])
+                print("Operator cancelled interception. Removing intercept from Bot {bot_id}")
                 to_remove.append(bot_id)
-                time.sleep(1)
                 continue
 
             # compute intercept
@@ -516,33 +514,43 @@ def intercept_tack() -> None:
                 heading_deg=track.heading,
                 speed_mps=track.speed,
             )
+            
+            bot_speed = bot["speed"]["over_ground"]
+            max_bot_speed = 3
+
+            if bot_speed <= track.speed and track.speed <= max_bot_speed:
+                bot_speed = track.speed
+            else:
+                bot_speed = 2.5
 
             interceptor = MovingObject(
                 lat_deg=bot["location"]["lat"],
                 lon_deg=bot["location"]["lon"],
                 heading_deg=bot["attitude"]["heading"],
-                speed_mps=3 
+                speed_mps=bot_speed 
             )
 
             result = intercept_point(target, interceptor, predict_ahead_secs=predict_ahead_secs)
 
             if result is None:
-                print("No feasible intercept at current interceptor speed.")
-                time.sleep(1)
+                intercepts[bot_id].state = InterceptState.CANCELLED
+                post_intercept_track(intercepts[bot_id])
+                print("No feasible intercept at current interceptor speed. Removing intercept from Bot {bot_id}")
+                to_remove.append(bot_id)
                 continue
 
             lat, lon, t = result
             
             if t > min_time_to_update_intercept_secs:
-                intercept_tracks[bot_id].lat = lat
-                intercept_tracks[bot_id].lon = lon
-                post_command(intercept_tracks[bot_id])
-                post_intercept_track(intercept_tracks[bot_id])
+                intercepts[bot_id].lat = lat
+                intercepts[bot_id].lon = lon
+                post_command(intercepts[bot_id])
+                post_intercept_track(intercepts[bot_id])
                 print("Sending updated intercept location.")
             else:
-                intercept_tracks[bot_id].state = InterceptState.TERMINATED
-                post_intercept_track(intercept_tracks[bot_id])
-                print(f"Not sending new command. Within {min_time_to_update_intercept_secs} sec.")
+                intercepts[bot_id].state = InterceptState.TERMINATED
+                post_intercept_track(intercepts[bot_id])
+                print(f"Not sending new command. Within {min_time_to_update_intercept_secs} sec. Removing intercept from Bot {bot_id}")
                 to_remove.append(bot_id)
 
         # now remove intercepts after the loop
@@ -566,7 +574,7 @@ if __name__ == "__main__":
         interceptTrackThread = Thread(target=intercept_tack, name='intercept-track', daemon=True)
         interceptTrackThread.start()
 
-        sentinelReceiveThread.join()
+        botStatusReceiveThread.join()
     except KeyboardInterrupt:
         print("\nExiting.")
     except Exception as e:
