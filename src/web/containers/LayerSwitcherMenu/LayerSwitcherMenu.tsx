@@ -218,6 +218,24 @@ export default function LayerSwitcherMenu() {
                         </div>
                         <div className="layer-container">
                             <Checkbox
+                                onClick={() => handleLayerClick(LayerTitles.DIVE_LAYER)}
+                                checked={layerCheckedStates.get(LayerTitles.DIVE_LAYER)}
+                                sx={getCheckboxStyle()}
+                                data-testid={`${LayerTitles.DIVE_LAYER}-checkbox`}
+                            />
+                            <p>Dive Packets</p>
+                        </div>
+                        <div className="layer-container">
+                            <Checkbox
+                                onClick={() => handleLayerClick(LayerTitles.DRIFT_LAYER)}
+                                checked={layerCheckedStates.get(LayerTitles.DRIFT_LAYER)}
+                                sx={getCheckboxStyle()}
+                                data-testid={`${LayerTitles.DRIFT_LAYER}-checkbox`}
+                            />
+                            <p>Drift Packets</p>
+                        </div>
+                        <div className="layer-container">
+                            <Checkbox
                                 onClick={() => handleLayerClick(LayerTitles.SENTINEL_LAYER)}
                                 checked={layerCheckedStates.get(LayerTitles.SENTINEL_LAYER)}
                                 sx={getCheckboxStyle()}
