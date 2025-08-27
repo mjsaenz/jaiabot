@@ -1,6 +1,6 @@
 import JaiaVectorLayer from "../jaia-vector-layer";
 import { LayerTitles } from "../../../../types/openlayers-types";
-import { TrackState } from "../../../../types/protobuf-types";
+import { InterceptState, TrackState } from "../../../../types/protobuf-types";
 import { layersZIndexes } from "../../zindex";
 import { generateTrackFeature } from "../../../features/sentinel/track-feature";
 import {
@@ -31,10 +31,13 @@ class SentinelLayer extends JaiaVectorLayer {
         }
 
         for (const [botID, intercept] of sentinel.getIntercepts()) {
-            const interceptFeature = generateInterceptFeature(botID, intercept);
-            const interceptLineFeature = generateInterceptLineFeature(botID, intercept);
+            const interceptFeature = generateInterceptFeature(intercept);
             source.addFeature(interceptFeature);
-            source.addFeature(interceptLineFeature);
+
+            if (intercept.state === InterceptState.IN_PROGRESS) {
+                const interceptLineFeature = generateInterceptLineFeature(intercept);
+                source.addFeature(interceptLineFeature);
+            }
         }
     }
 }

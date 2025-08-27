@@ -6,13 +6,13 @@ import { Icon, Style, Text, Fill, Stroke } from "ol/style";
 
 import { bots } from "../../../data/bots/bots";
 import { view } from "../../views/view";
-import { Intercept } from "../../../types/protobuf-types";
+import { Intercept, InterceptState } from "../../../types/protobuf-types";
 import { MapFeatureTypes } from "../../../types/openlayers-types";
 
 import interceptIcon from "../../../style/icons/sentinel/intercept-icon.svg";
 import { OpenLayersColors } from "../../../style/openlayers/colors";
 
-export function generateInterceptFeature(botID: number, intercept: Intercept) {
+export function generateInterceptFeature(intercept: Intercept) {
     if (!intercept.location) {
         return new Feature();
     }
@@ -22,30 +22,36 @@ export function generateInterceptFeature(botID: number, intercept: Intercept) {
         geometry: new Point(fromLonLat(coordinate, view.getProjection())),
     });
     feature.set("type", MapFeatureTypes.SENTINAL_INTERCEPT);
-    feature.set("id", botID);
-    feature.setStyle(generateInterceptStyle(botID));
+    feature.set("id", intercept.bot_id);
+    feature.setStyle(generateInterceptStyle(intercept));
     return feature;
 }
 
-function generateInterceptStyle(botID: number) {
+function generateInterceptStyle(intercept: Intercept) {
+    let opacity = 1;
+    if (intercept.state !== InterceptState.IN_PROGRESS) {
+        opacity = 0.25;
+    }
+
     return new Style({
         image: new Icon({
             src: interceptIcon,
             scale: 0.45,
+            opacity: opacity,
         }),
         text: new Text({
-            text: botID.toString(),
+            text: intercept.bot_id?.toString(),
             font: "bold 11pt sans-serif",
             fill: new Fill({
                 color: "white",
             }),
         }),
-        zIndex: botID,
+        zIndex: intercept.bot_id,
     });
 }
 
-export function generateInterceptLineFeature(botID: number, intercept: Intercept) {
-    const botLocation = bots.getBot(botID)?.getLocation();
+export function generateInterceptLineFeature(intercept: Intercept) {
+    const botLocation = bots.getBot(intercept.bot_id)?.getLocation();
 
     if (!botLocation || !intercept.location) {
         return new Feature();
@@ -60,17 +66,17 @@ export function generateInterceptLineFeature(botID: number, intercept: Intercept
     const feature = new Feature({
         geometry: new LineString([startCoordinate, endCoordinate]),
     });
-    feature.setStyle(generateInterceptLineStyle(botID));
+    feature.setStyle(generateInterceptLineStyle(intercept));
     return feature;
 }
 
-function generateInterceptLineStyle(botID: number) {
+function generateInterceptLineStyle(intercept: Intercept) {
     return new Style({
         stroke: new Stroke({
             width: 4,
             color: OpenLayersColors.MEASURE_LINE,
             lineDash: [15, 30],
         }),
-        zIndex: botID,
+        zIndex: intercept.bot_id,
     });
 }

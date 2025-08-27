@@ -1243,9 +1243,9 @@ export interface Track {
 }
 
 export enum InterceptState {
-    IN_PROGRESS = 1,
-    TERMINATED = 2,
-    CANCELLED = 3,
+    IN_PROGRESS = "IN_PROGRESS",
+    TERMINATED = "TERMINATED",
+    CANCELLED = "CANCELLED",
 }
 
 export interface Intercept {
