@@ -158,7 +158,7 @@ export function Plots(props: PlotsProps) {
                 xaxis: "x",
                 yaxis: yaxis,
                 hovertext: [],
-                type: "scatter",
+                type: "scattergl",
                 mode: "lines+markers",
             };
 
@@ -185,12 +185,11 @@ export function Plots(props: PlotsProps) {
                 props.delegate.setTime(timestamp_utime);
             });
 
-
-	    	plot_div_element.on("plotly_click", function (data) {
-  				let pointIndex = data.points[0].pointIndex;
-  				let timestamp_utime = Number(data.points[0].data.customdata[pointIndex]);
-  				props.delegate.setTime(timestamp_utime);
-	    	});
+            plot_div_element.on("plotly_click", function (data) {
+                let pointIndex = data.points[0].pointIndex;
+                let timestamp_utime = Number(data.points[0].data.customdata[pointIndex]);
+                props.delegate.setTime(timestamp_utime);
+            });
 
             // Zooming into plots
             plot_div_element.on("plotly_relayout", function (eventdata: Plotly.PlotRelayoutEvent) {
@@ -239,6 +238,38 @@ export function Plots(props: PlotsProps) {
             ];
         };
 
+        const downsampleSeries = (
+            series: number[],
+            start_index: number,
+            end_index: number,
+            increment: number,
+        ) => {
+            let result_indices: number[] = [];
+            let lastVal = 0;
+            start_index = Math.max(0, start_index);
+            end_index = Math.min(series.length, end_index);
+
+            for (let base_index = start_index; base_index < end_index; base_index += increment) {
+                let index = base_index;
+                let bestIndex = index;
+                let highestDiff = 0;
+                for (
+                    index = base_index;
+                    index < base_index + increment && index < end_index;
+                    index++
+                ) {
+                    let diff = Math.abs(series[index] - lastVal);
+                    if (diff > highestDiff) {
+                        bestIndex = index;
+                        highestDiff = diff;
+                    }
+                }
+                result_indices.push(bestIndex);
+                lastVal = series[bestIndex];
+            }
+            return result_indices;
+        };
+
         for (let [plot_index, series] of plots.entries()) {
             if (shouldUseAllData) {
                 update.x.push(series._utime_.map((t_micros) => microsToDate(t_micros)));
@@ -275,35 +306,23 @@ export function Plots(props: PlotsProps) {
                 inside_index_step,
             );
 
-            const outside_index_step = inside_index_step * 4;
-            const outside_time_min = visibleTimeRange[0] - visible_duration;
-            const outside_time_max = visibleTimeRange[1] + visible_duration;
-            const [outside_index_min, outside_index_max] = getIndexRange(
-                series,
-                outside_time_min,
-                outside_time_max,
-                outside_index_step,
+            const outside_index_min = inside_index_min - MAX_DATA_POINTS;
+            const outside_index_max = inside_index_max + MAX_DATA_POINTS;
+            const indices = downsampleSeries(
+                series.series_y,
+                outside_index_min,
+                outside_index_max,
+                inside_index_step,
             );
 
             let x_values = [];
             let customdata = [];
             let y_values = [];
 
-            let data_index = outside_index_min;
-
-            while (data_index < outside_index_max) {
+            for (const data_index of indices) {
                 customdata.push(series._utime_[data_index]);
                 x_values.push(microsToDate(series._utime_[data_index]));
                 y_values.push(series.series_y[data_index]);
-
-                if (
-                    data_index + inside_index_step > inside_index_min &&
-                    data_index < inside_index_max
-                ) {
-                    data_index += inside_index_step;
-                } else {
-                    data_index += outside_index_step;
-                }
             }
 
             let hovertext = y_values.map((y) => series.hovertext?.[y]);
