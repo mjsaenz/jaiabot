@@ -965,7 +965,7 @@ jaiabot::statechart::inmission::underway::task::dive::UnpoweredAscent::Unpowered
     typename StateBase::my_context c)
     : StateBase(c)
 {
-    if (cfg().has_stop_camera_command())
+    if (cfg().camera_avaialble() && cfg().has_stop_camera_command())
     {
         interprocess().publish<jaiabot::groups::camera>(cfg().stop_camera_command());
     }
