@@ -338,6 +338,12 @@ def surob_results_request(jaia_request: APIRequest) -> APIResponse:
     WAVE_PERIOD_CF_STANDARD_NAME = "sea_surface_wave_significant_period"
     WAVE_PROPERTIES_UNITS  = "degrees"
     WAVE_PROPERTIES_TYPE = "wave_measurement"
+
+    DEPTH_UNITS = "feet"
+    DEPTH_CF_STANDARD_NAME = "sea_floor_depth_below_sea_surface"
+    DEPTH_PROPERTIES_UNITS = "degrees"
+    DEPTH_PROPERTIES_TYPE = "depth_measurement"
+
     PROPERTIES_H_DATUM = "wgs84"
 
     POINT_GEOMETRY_TYPE = "Point"
@@ -470,6 +476,7 @@ def surob_results_request(jaia_request: APIRequest) -> APIResponse:
 
     current_measurement_id = 0
     wave_measurement_id = 0
+    depth_measurement_id = 0
 
     features = []
 
@@ -604,6 +611,35 @@ def surob_results_request(jaia_request: APIRequest) -> APIResponse:
                 # append sig wave period values, if multiple are received, average for final result
                 surface_drift_sig_wave_periods_s.append(task_packet.wave.period)
                 surface_drift_sig_wave_period_std_s.append(task_packet.wave.period_stdev)
+
+                curr_start_time_us = task_packet.start_time
+                curr_end_time_us = task_packet.end_time
+                if curr_start_time_us < min_start_time_us:
+                    min_start_time_us = curr_start_time_us
+                if curr_end_time_us > max_end_time_us:
+                    max_end_time_us = curr_end_time_us
+
+        elif task_packet.type == MissionTask.TaskType.DIVE:
+            if task_packet.HasField("dive") and task_packet.dive.HasField("bottom_dive") and task_packet.dive.bottom_dive:
+                depth_ft = meters_to_feet(task_packet.dive.depth_achieved)
+                curr_depth_measurement = jaiabot.messages.surob_results_pb2.ValueUnitsCF(value=depth_ft,
+                                                                                         units=DEPTH_UNITS,
+                                                                                         cf_standard_name=DEPTH_CF_STANDARD_NAME)
+                curr_depth_properties = jaiabot.messages.surob_results_pb2.Properties(units=DEPTH_PROPERTIES_TYPE,
+                                                                                      type=DEPTH_PROPERTIES_TYPE,
+                                                                                      description=f"Jaiabot bottom dive depth measurement from bot {task_packet.bot_id}",
+                                                                                      id=depth_measurement_id,
+                                                                                      h_datum=PROPERTIES_H_DATUM,
+                                                                                      depth_measurement=curr_depth_measurement)
+                
+                curr_depth_coordinates = [task_packet.dive.start_location.lon, task_packet.dive.start_location.lat]
+                curr_depth_geometry = jaiabot.messages.surob_results_pb2.PointGeometry(type=POINT_GEOMETRY_TYPE)
+                curr_depth_geometry.coordinates.extend(curr_depth_coordinates)
+
+                curr_depth = jaiabot.messages.surob_results_pb2.Feature(type=FEATURE_TYPE, properties=curr_depth_properties, geometry=curr_depth_geometry)
+
+                features.append(curr_depth)
+                depth_measurement_id += 1
 
                 curr_start_time_us = task_packet.start_time
                 curr_end_time_us = task_packet.end_time
