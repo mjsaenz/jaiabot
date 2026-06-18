@@ -15,12 +15,6 @@ message ValueUncertUnitsCF {
     optional string cf_standard_name = 4;
 }
 
-message ValueUnitsCF {
-    optional double value = 1;
-    optional string units = 2;
-    optional string cf_standard_name = 3;
-}
-
 message LittoralCurrent {
     optional double value = 1;
     optional double uncert = 2;
@@ -68,7 +62,7 @@ message Properties {
     optional string h_datum = 6 [default="wgs84"];
     optional WaveMeasurement wave_measurement = 7;
     optional CurrentMeasurement current_measurement = 8;
-    optional ValueUnitsCF depth_measurement = 9;
+    optional ValueUncertUnitsCF depth_measurement = 9;
 }
 
 message PointGeometry {
