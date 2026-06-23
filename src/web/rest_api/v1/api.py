@@ -643,7 +643,7 @@ def surob_results_request(jaia_request: APIRequest) -> APIResponse:
             if task_packet.HasField("dive") and task_packet.dive.HasField("bottom_dive") and task_packet.dive.bottom_dive:
                 dive_task_packets.append(task_packet)
 
-    for bot_id in hs_dict.keys:
+    for bot_id in hs_dict:
         # reverse list so they are sorted in accending chronological order for use with bisect()
         hs_dict[bot_id]["hs_ft"].reverse()
         hs_dict[bot_id]["end_time"].reverse()
@@ -654,7 +654,7 @@ def surob_results_request(jaia_request: APIRequest) -> APIResponse:
         # as surob conops dictates that dives are performed after each measurement, hs estimate corresponding to each dive will from the measurement immediately prior
         curr_bot_id_hs_measurement_times = hs_dict[task_packet.bot_id]["end_time"]
         curr_depth_measurement_corresponding_hs_idx = bisect_right(curr_bot_id_hs_measurement_times, task_packet.start_time) - 1 # element immediately before bisect_right idx will be last hs measurement before current dive
-        curr_depth_measurement_corresponding_hs_ft = meters_to_feet(hs_dict[task_packet.bot_id]["hs_ft"][curr_depth_measurement_corresponding_hs_idx])
+        curr_depth_measurement_corresponding_hs_ft = hs_dict[task_packet.bot_id]["hs_ft"][curr_depth_measurement_corresponding_hs_idx]
         depth_uncertainty_hs_scaling_factor = 0.5 # testing placeholder, value in range of [0.1, 1], more rigorous testing to follow to cateogrize depth measurement uncertainty
         depth_uncertainty_ft = (depth_uncertainty_hs_scaling_factor * curr_depth_measurement_corresponding_hs_ft) / 2.0
 
